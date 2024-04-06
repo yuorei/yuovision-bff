@@ -2,6 +2,9 @@ package application
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
+	"os"
 	"sort"
 
 	"github.com/yuorei/video-server/app/application/port"
@@ -71,19 +74,36 @@ func (a *Application) UploadVideo(ctx context.Context, video *domain.UploadVideo
 		return nil, err
 	}
 
-	var imageURL string
 	if imageBuffer == nil {
 		err = a.Image.imageRepository.CreateThumbnail(ctx, video.ID, video.Video)
 		if err != nil {
 			return nil, err
 		}
 	}
-
-	imageURL, err = a.Image.imageRepository.UploadImageForStorage(ctx, video.ID)
+	imagePath := video.ID + ".webp"
+	image, err := os.Open(imagePath)
+	if err != nil {
+		return nil, err
+	}
+	defer func() error {
+		err := os.Remove(imagePath)
+		if err != nil {
+			return err
+		}
+		return nil
+	}()
+	data, err := ioutil.ReadAll(image)
 	if err != nil {
 		return nil, err
 	}
 
+	thumbnail := domain.NewThumbnailImage(video.ID, data)
+	err = a.Image.imageRepository.UploadThumbnailForStorage(ctx, *thumbnail)
+	if err != nil {
+		return nil, err
+	}
+
+	imageURL := fmt.Sprintf("%s/%s/%s", os.Getenv("AWS_S3_URL"), "thumbnail-image", imagePath)
 	videoResponse, err := a.Video.videoRepository.InsertVideo(ctx, video.ID, videoURL, imageURL, video.Title, video.Description, id)
 	if err != nil {
 		return nil, err
