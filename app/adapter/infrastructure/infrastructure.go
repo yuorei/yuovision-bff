@@ -2,18 +2,18 @@ package infrastructure
 
 import (
 	"github.com/redis/go-redis/v9"
-	"github.com/yuorei/video-server/app/driver/db"
+	"github.com/yuorei/video-server/app/driver/client"
 	r "github.com/yuorei/video-server/app/driver/redis"
 )
 
 type Infrastructure struct {
-	db    *db.DB
-	redis *redis.Client
+	redis      *redis.Client
+	gRPCClient *client.Client
 }
 
 func NewInfrastructure() *Infrastructure {
 	return &Infrastructure{
-		db:    db.NewMongoDB(),
-		redis: r.ConnectRedis(),
+		redis:      r.ConnectRedis(),
+		gRPCClient: client.NewClient(),
 	}
 }
