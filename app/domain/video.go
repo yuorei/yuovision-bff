@@ -45,6 +45,7 @@ type (
 
 	ThumbnailImage struct {
 		ID             string
+		ContentType    string
 		ThumbnailImage []byte
 	}
 )
@@ -84,9 +85,10 @@ func NewVideoFile(id string, video io.ReadSeeker) *VideoFile {
 	}
 }
 
-func NewThumbnailImage(id string, thumbnailImage []byte) *ThumbnailImage {
+func NewThumbnailImage(id, contentType string, thumbnailImage []byte) *ThumbnailImage {
 	return &ThumbnailImage{
 		ID:             id,
+		ContentType:    contentType,
 		ThumbnailImage: thumbnailImage,
 	}
 }

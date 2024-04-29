@@ -157,8 +157,11 @@ func (i *Infrastructure) UploadThumbnailForStorage(ctx context.Context, thumbnai
 		return err
 	}
 
-	meta := &video_grpc.UploadThumbnailInput_Id{
-		Id: thumbnail.ID,
+	meta := &video_grpc.UploadThumbnailInput_Meta{
+		Meta: &video_grpc.ThumbnailMeta{
+			Id:          thumbnail.ID,
+			ContentType: thumbnail.ContentType,
+		},
 	}
 
 	request := &video_grpc.UploadThumbnailInput{

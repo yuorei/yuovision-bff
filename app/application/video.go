@@ -1,9 +1,9 @@
 package application
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 
@@ -53,58 +53,37 @@ func (a *Application) GetVideo(ctx context.Context, videoID string) (*domain.Vid
 }
 
 func (a *Application) UploadVideo(ctx context.Context, video *domain.UploadVideo) (*domain.UploadVideoResponse, error) {
-	id, err := middleware.GetUserIDFromContext(ctx)
+	userID, err := middleware.GetUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	videofile := domain.NewVideoFile(video.ID, video.Video)
-	err = a.Video.videoRepository.ConvertVideoHLS(ctx, videofile)
+	videoURL, err := a.Video.videoRepository.UploadVideoForStorage(ctx, video, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	videoURL, err := a.Video.videoRepository.UploadVideoForStorage(ctx, videofile)
-	if err != nil {
-		return nil, err
-	}
-
-	imageBuffer, err := a.Image.imageRepository.ConvertThumbnailToWebp(ctx, video.ThumbnailImage, video.ImageContentType, video.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	if imageBuffer == nil {
-		err = a.Image.imageRepository.CreateThumbnail(ctx, video.ID, video.Video)
+	var data []byte
+	if video.ThumbnailImage != nil {
+		buf := new(bytes.Buffer)
+		_, err = buf.ReadFrom(*video.ThumbnailImage)
 		if err != nil {
 			return nil, err
 		}
-	}
-	imagePath := video.ID + ".webp"
-	image, err := os.Open(imagePath)
-	if err != nil {
-		return nil, err
-	}
-	defer func() error {
-		err := os.Remove(imagePath)
-		if err != nil {
-			return err
-		}
-		return nil
-	}()
-	data, err := ioutil.ReadAll(image)
-	if err != nil {
-		return nil, err
+		data = buf.Bytes()
 	}
 
-	thumbnail := domain.NewThumbnailImage(video.ID, data)
+	contentType := video.ImageContentType
+	thumbnail := domain.NewThumbnailImage(video.ID, contentType, data)
 	err = a.Image.imageRepository.UploadThumbnailForStorage(ctx, *thumbnail)
 	if err != nil {
 		return nil, err
 	}
 
-	imageURL := fmt.Sprintf("%s/%s/%s", os.Getenv("AWS_S3_URL"), "thumbnail-image", imagePath)
-	videoResponse, err := a.Video.videoRepository.InsertVideo(ctx, video.ID, videoURL, imageURL, video.Title, video.Description, id)
+	imagePath := video.ID + ".webp"
+	const buckerName = "thumbnail-image"
+	imageURL := fmt.Sprintf("%s/%s/%s", os.Getenv("AWS_S3_URL"), buckerName, imagePath)
+	videoResponse, err := a.Video.videoRepository.InsertVideo(ctx, video.ID, videoURL, imageURL, video.Title, video.Description, userID)
 	if err != nil {
 		return nil, err
 	}

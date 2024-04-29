@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -14,39 +13,69 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/yuorei/video-server/app/domain"
+	"github.com/yuorei/video-server/lib"
+	"github.com/yuorei/video-server/yuovision-proto/go/video/video_grpc"
 )
 
-func (i *Infrastructure) UploadVideoForStorage(ctx context.Context, video *domain.VideoFile) (string, error) {
-	err := filepath.Walk("output", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// 対象のファイルかどうかを確認
-		if strings.HasPrefix(filepath.Base(path), "output_"+video.ID) && (strings.HasSuffix(path, ".m3u8") || strings.HasSuffix(path, ".ts")) {
-			// TODO: 失敗した時にtsファイルを削除できるように修正する
-			defer func() error {
-				err = os.Remove(path)
-				if err != nil {
-					return err
-				}
-				return nil
-			}()
-			err := uploadVideoForS3(path)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
+func (i *Infrastructure) UploadVideoForStorage(ctx context.Context, video *domain.UploadVideo, userID string) (string, error) {
+	stream, err := i.gRPCClient.VideoClient.UploadVideo(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to remove output files: %w", err)
+		return "", err
 	}
 
-	bucketName := "video"
-	url := fmt.Sprintf("%s/%s/output_%s.m3u8", os.Getenv("AWS_S3_URL"), bucketName, video.ID)
-	return url, nil
+	meta := &video_grpc.UploadVideoInput_Meta{
+		Meta: &video_grpc.VideoMeta{
+			Id:                video.ID,
+			Title:             video.Title,
+			Description:       *video.Description,
+			UserId:            userID,
+			ThumbnailImageUrl: fmt.Sprintf("%s/%s/%s.webp", os.Getenv("AWS_S3_URL"), "thumbnail-image", video.ID),
+		},
+	}
+
+	request := &video_grpc.UploadVideoInput{
+		Value: meta,
+	}
+
+	err = stream.Send(request)
+	if err != nil {
+		return "", err
+	}
+
+	data, err := lib.ReadSeekerToBytes(video.Video)
+	if err != nil {
+		return "", err
+	}
+	chunkSize := 3 * 1024 * 1024 // チャンクサイズ（3MB）
+	for offset := 0; offset < len(data); offset += chunkSize {
+		end := offset + chunkSize
+		if end > len(data) {
+			end = len(data)
+		}
+		chunk := data[offset:end]
+
+		// Create a request containing the chunk of thumbnail data
+		request := &video_grpc.UploadVideoInput{
+			Value: &video_grpc.UploadVideoInput_Video{
+				Video: chunk,
+			},
+		}
+		// Send the chunk data
+		err := stream.Send(request)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	// Receive response from the server
+	videoPayload, err := stream.CloseAndRecv()
+	if err != nil {
+		return "", err
+	}
+
+	// bucketName := "video"
+	// url := fmt.Sprintf("%s/%s/output_%s.m3u8", os.Getenv("AWS_S3_URL"), bucketName, video.ID)
+	return videoPayload.VideoUrl, nil
 }
 
 func uploadVideoForS3(path string) error {
