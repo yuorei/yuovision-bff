@@ -2,52 +2,36 @@ package infrastructure
 
 import (
 	"context"
-	"fmt"
-	"log"
 
 	"github.com/yuorei/video-server/app/domain"
-	"github.com/yuorei/video-server/app/driver/db/mongodb/collection"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/yuorei/video-server/yuovision-proto/go/video/video_grpc"
 )
 
 func (i *Infrastructure) GetCommentsByVideoIDFromDB(ctx context.Context, videoID string) ([]*domain.Comment, error) {
-	mongoCollection := i.db.Database.Collection("comment")
-	if mongoCollection == nil {
-		return nil, fmt.Errorf("collection is nil")
-	}
-
-	cursor, err := mongoCollection.Find(ctx, bson.D{{"videoid", videoID}})
+	comment, err := i.gRPCClient.CommentClient.CommentsByVideo(ctx, &video_grpc.CommentsByVideoInput{VideoId: videoID})
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)
 
-	var comments []*domain.Comment
-	for cursor.Next(ctx) {
-		var commentForDB collection.Comment
-		if err := cursor.Decode(&commentForDB); err != nil {
-			return nil, err
-		}
-		comment := domain.NewComment(commentForDB.ID, videoID, commentForDB.Text, commentForDB.CreatedAt, commentForDB.UpdatedAt, domain.NewUser(commentForDB.User.ID, commentForDB.User.Name, commentForDB.User.ProfileImageURL, commentForDB.User.SubscribeChannelIDs))
-		comments = append(comments, comment)
-	}
-	if err := cursor.Err(); err != nil {
-		return nil, err
+	comments := make([]*domain.Comment, 0, len(comment.Comments))
+	for _, c := range comment.Comments {
+		comments = append(comments, domain.NewComment(c.Id, c.Video.Id, c.Text, c.CreatedAt.AsTime(), c.CreatedAt.AsTime(), &domain.User{ID: c.UserId, Name: c.Name}))
 	}
 	return comments, nil
 }
 
 func (i *Infrastructure) InsertComment(ctx context.Context, postComment *domain.Comment) (*domain.Comment, error) {
-	collection := i.db.Database.Collection("comment")
-	if collection == nil {
-		return nil, fmt.Errorf("collection is nil")
+	commentInput := &video_grpc.PostCommentInput{
+		VideoId: postComment.VideoID,
+		UserId:  postComment.User.ID,
+		Text:    postComment.Text,
+		Name:    postComment.User.Name,
 	}
 
-	commentForDB := domain.NewCommentForDB(postComment.ID, postComment.VideoID, postComment.User.ID, postComment.User.Name, postComment.Text)
-	insertResult, err := collection.InsertOne(ctx, commentForDB)
+	comment, err := i.gRPCClient.CommentClient.PostComment(ctx, commentInput)
 	if err != nil {
 		return nil, err
 	}
-	log.Println("Inserted a single document: ", insertResult.InsertedID)
-	return postComment, nil
+
+	return domain.NewComment(comment.Id, comment.Video.Id, comment.Text, comment.CreatedAt.AsTime(), comment.CreatedAt.AsTime(), &domain.User{ID: comment.UserId, Name: comment.Name}), nil
 }

@@ -21,5 +21,4 @@ type VideoRepository interface {
 	ConvertVideoHLS(context.Context, *domain.VideoFile) error
 	UploadVideoForStorage(context.Context, *domain.UploadVideo, string) (string, error)
 	GetVideoFromDB(context.Context, string) (*domain.Video, error)
-	InsertVideo(context.Context, string, string, string, string, *string, string) (*domain.UploadVideoResponse, error)
 }

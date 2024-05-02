@@ -3,12 +3,11 @@ package infrastructure
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/yuorei/video-server/app/domain"
-	"github.com/yuorei/video-server/app/driver/db/mongodb/collection"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/yuorei/video-server/yuovision-proto/go/video/video_grpc"
 )
 
 func (i *Infrastructure) GetVideosFromDB(ctx context.Context) ([]*domain.Video, error) {
@@ -22,27 +21,14 @@ func (i *Infrastructure) GetVideosFromDB(ctx context.Context) ([]*domain.Video, 
 		return videos, nil
 	}
 
-	mongoCollection := i.db.Database.Collection("video")
-	if mongoCollection == nil {
-		return nil, fmt.Errorf("collection is nil")
-	}
-
-	cursor, err := mongoCollection.Find(ctx, bson.D{})
+	videosResponse, err := i.gRPCClient.VideoClient.Videos(ctx, &empty.Empty{})
 	if err != nil {
 		return nil, err
 	}
-
-	for cursor.Next(ctx) {
-		var videoForDB collection.Video
-		err := cursor.Decode(&videoForDB)
-		if err != nil {
-			return nil, err
-		}
-
-		video := domain.NewVideo(videoForDB.ID, videoForDB.VideoURL, videoForDB.ThumbnailImageURL, videoForDB.Title, videoForDB.Description, videoForDB.UploaderID, videoForDB.CreatedAt)
-		videos = append(videos, video)
+	videos = make([]*domain.Video, 0, len(videosResponse.Videos))
+	for _, video := range videosResponse.Videos {
+		videos = append(videos, domain.NewVideo(video.Id, video.VideoUrl, video.ThumbnailImageUrl, video.Title, &video.Description, video.UserId, video.CreatedAt.AsTime()))
 	}
-
 	err = setToRedis(ctx, i.redis, key, 1*time.Minute, videos)
 	if err != nil {
 		return nil, err
@@ -52,68 +38,23 @@ func (i *Infrastructure) GetVideosFromDB(ctx context.Context) ([]*domain.Video, 
 }
 
 func (i *Infrastructure) GetVideosByUserIDFromDB(ctx context.Context, userID string) ([]*domain.Video, error) {
-	mongoCollection := i.db.Database.Collection("video")
-	if mongoCollection == nil {
-		return nil, fmt.Errorf("collection is nil")
-	}
-
-	cursor, err := mongoCollection.Find(ctx, bson.D{{"uploaderid", userID}})
+	videoResponse, err := i.gRPCClient.VideoClient.VideosByUserID(ctx, &video_grpc.VideoUserID{Id: userID})
 	if err != nil {
 		return nil, err
 	}
-
-	var videos []*domain.Video
-	for cursor.Next(ctx) {
-		var videoForDB collection.Video
-		err := cursor.Decode(&videoForDB)
-		if err != nil {
-			return nil, err
-		}
-
-		video := domain.NewVideo(videoForDB.ID, videoForDB.VideoURL, videoForDB.ThumbnailImageURL, videoForDB.Title, videoForDB.Description, videoForDB.UploaderID, videoForDB.CreatedAt)
-		videos = append(videos, video)
+	videos := make([]*domain.Video, 0, len(videoResponse.Videos))
+	for _, video := range videoResponse.Videos {
+		videos = append(videos, domain.NewVideo(video.Id, video.VideoUrl, video.ThumbnailImageUrl, video.Title, &video.Description, video.UserId, video.CreatedAt.AsTime()))
 	}
-
 	return videos, nil
 }
 
 func (i *Infrastructure) GetVideoFromDB(ctx context.Context, id string) (*domain.Video, error) {
-	mongoCollection := i.db.Database.Collection("video")
-	if mongoCollection == nil {
-		return nil, fmt.Errorf("collection is nil")
-	}
-
-	var videoForDB collection.Video
-	err := mongoCollection.FindOne(ctx, bson.D{{"_id", id}}).Decode(&videoForDB)
+	videoPayload, err := i.gRPCClient.VideoClient.Video(ctx, &video_grpc.VideoID{Id: id})
 	if err != nil {
 		return nil, err
 	}
 
-	video := domain.NewVideo(videoForDB.ID, videoForDB.VideoURL, videoForDB.ThumbnailImageURL, videoForDB.Title, videoForDB.Description, videoForDB.UploaderID, videoForDB.CreatedAt)
+	video := domain.NewVideo(videoPayload.Id, videoPayload.VideoUrl, videoPayload.ThumbnailImageUrl, videoPayload.Title, &videoPayload.Description, videoPayload.UserId, videoPayload.CreatedAt.AsTime())
 	return video, nil
-}
-
-func (i *Infrastructure) InsertVideo(ctx context.Context, id string, videoURL string, thumbnailImageURL string, title string, description *string, uploaderID string) (*domain.UploadVideoResponse, error) {
-	mongoCollection := i.db.Database.Collection("video")
-	if mongoCollection == nil {
-		return nil, fmt.Errorf("collection is nil")
-	}
-
-	videoForDB := collection.NewVideoCollection(id, videoURL, thumbnailImageURL, title, description, uploaderID)
-	insertResult, err := mongoCollection.InsertOne(ctx, videoForDB)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Println("Inserted a single document: ", insertResult.InsertedID)
-
-	return &domain.UploadVideoResponse{
-		ID:                videoForDB.ID,
-		VideoURL:          videoForDB.VideoURL,
-		ThumbnailImageURL: videoForDB.ThumbnailImageURL,
-		Title:             videoForDB.Title,
-		Description:       videoForDB.Description,
-		UploaderID:        videoForDB.UploaderID,
-		CreatedAt:         videoForDB.CreatedAt,
-	}, nil
 }

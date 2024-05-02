@@ -83,9 +83,13 @@ func (a *Application) UploadVideo(ctx context.Context, video *domain.UploadVideo
 	imagePath := video.ID + ".webp"
 	const buckerName = "thumbnail-image"
 	imageURL := fmt.Sprintf("%s/%s/%s", os.Getenv("AWS_S3_URL"), buckerName, imagePath)
-	videoResponse, err := a.Video.videoRepository.InsertVideo(ctx, video.ID, videoURL, imageURL, video.Title, video.Description, userID)
-	if err != nil {
-		return nil, err
+	videoResponse := &domain.UploadVideoResponse{
+		ID:                video.ID,
+		VideoURL:          videoURL,
+		ThumbnailImageURL: imageURL,
+		Title:             video.Title,
+		Description:       video.Description,
+		UploaderID:        userID,
 	}
 
 	return videoResponse, nil

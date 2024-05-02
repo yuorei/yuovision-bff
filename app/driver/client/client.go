@@ -9,7 +9,9 @@ import (
 )
 
 type Client struct {
-	VideoClient video_grpc.VideoServiceClient
+	VideoClient   video_grpc.VideoServiceClient
+	UserClient    video_grpc.UserServiceClient
+	CommentClient video_grpc.CommentServiceClient
 }
 
 func NewClient() *Client {
@@ -36,4 +38,6 @@ func (c *Client) NewConnect() {
 	}
 
 	c.VideoClient = video_grpc.NewVideoServiceClient(conn)
+	c.UserClient = video_grpc.NewUserServiceClient(conn)
+	c.CommentClient = video_grpc.NewCommentServiceClient(conn)
 }
