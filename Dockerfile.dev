@@ -3,11 +3,6 @@ FROM golang:latest
 WORKDIR /app
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
-RUN apt-get update -y && \
-    apt-get install -y \
-    libwebp-dev \
-    ffmpeg
-
 RUN go install github.com/cosmtrek/air@latest
 
 ENV GOCACHE=/tmp/.cache
