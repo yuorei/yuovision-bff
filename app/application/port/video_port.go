@@ -18,7 +18,6 @@ type VideoInputPort interface {
 type VideoRepository interface {
 	GetVideosFromDB(context.Context) ([]*domain.Video, error)
 	GetVideosByUserIDFromDB(context.Context, string) ([]*domain.Video, error)
-	ConvertVideoHLS(context.Context, *domain.VideoFile) error
 	UploadVideoForStorage(context.Context, *domain.UploadVideo, string) (string, error)
 	GetVideoFromDB(context.Context, string) (*domain.Video, error)
 }
