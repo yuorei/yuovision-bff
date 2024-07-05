@@ -13,6 +13,11 @@ type (
 		ThumbnailImageURL string
 		Title             string
 		Description       *string
+		Tags              []string
+		IsPrivate         bool
+		IsAdult           bool
+		IsExternalCutout  bool
+		IsAd              bool
 		UploaderID        string
 		CreatedAt         time.Time
 		UpdatedAt         time.Time
@@ -26,6 +31,12 @@ type (
 		ImageContentType string
 		Title            string
 		Description      *string
+		Tags             []string
+		IsPrivate        bool
+		IsAdult          bool
+		IsExternalCutout bool
+		IsAd             bool
+		ExternalCutout   bool
 	}
 
 	UploadVideoResponse struct {
@@ -34,6 +45,11 @@ type (
 		ThumbnailImageURL string
 		Title             string
 		Description       *string
+		Tags              []string
+		IsPrivate         bool
+		IsAdult           bool
+		IsExternalCutout  bool
+		IsAd              bool
 		UploaderID        string
 		CreatedAt         time.Time
 	}
@@ -54,19 +70,25 @@ func NewVideoID() string {
 	return fmt.Sprintf("%s%s%s", "video", IDSeparator, NewUUID())
 }
 
-func NewVideo(id string, videoURL string, thumbnailImageURL string, title string, description *string, uploaderID string, createdAt time.Time) *Video {
+func NewVideo(id string, videoURL string, thumbnailImageURL string, title string, description *string, tags []string, private bool, adult bool, externalCutout bool, isAd bool, uploaderID string, createdAt time.Time, updatedAt time.Time) *Video {
 	return &Video{
 		ID:                id,
 		VideoURL:          videoURL,
 		ThumbnailImageURL: thumbnailImageURL,
 		Title:             title,
 		Description:       description,
+		Tags:              tags,
+		IsPrivate:         private,
+		IsAdult:           adult,
+		IsExternalCutout:  externalCutout,
+		IsAd:              isAd,
 		UploaderID:        uploaderID,
 		CreatedAt:         createdAt,
+		UpdatedAt:         updatedAt,
 	}
 }
 
-func NewUploadVideo(id string, video io.ReadSeeker, videoContentType string, thumbnailImage *io.ReadSeeker, imageContentType string, title string, description *string) *UploadVideo {
+func NewUploadVideo(id string, video io.ReadSeeker, videoContentType string, thumbnailImage *io.ReadSeeker, imageContentType string, title string, description *string, tags []string, private bool, adult bool, externalCutout bool, isAd bool) *UploadVideo {
 	return &UploadVideo{
 		ID:               id,
 		Video:            video,
@@ -75,6 +97,12 @@ func NewUploadVideo(id string, video io.ReadSeeker, videoContentType string, thu
 		ImageContentType: imageContentType,
 		Title:            title,
 		Description:      description,
+		Tags:             tags,
+		IsPrivate:        private,
+		IsAdult:          adult,
+		IsExternalCutout: externalCutout,
+		IsAd:             isAd,
+		ExternalCutout:   externalCutout,
 	}
 }
 

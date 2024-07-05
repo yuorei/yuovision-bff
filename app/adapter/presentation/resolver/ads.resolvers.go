@@ -12,12 +12,12 @@ import (
 	"github.com/yuorei/video-server/graph/generated"
 )
 
-// Node is the resolver for the node field.
-func (r *queryResolver) Node(ctx context.Context, id string) (model.Node, error) {
-	panic(fmt.Errorf("not implemented: Node - node"))
+// ID is the resolver for the id field.
+func (r *adResolver) ID(ctx context.Context, obj *model.Ad) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
 }
 
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+// Ad returns generated.AdResolver implementation.
+func (r *Resolver) Ad() generated.AdResolver { return &adResolver{r} }
 
-type queryResolver struct{ *Resolver }
+type adResolver struct{ *Resolver }

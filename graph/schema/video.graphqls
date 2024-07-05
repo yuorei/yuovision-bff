@@ -7,6 +7,12 @@ type Video implements Node{
     title: String!
     thumbnailImageURL: String!
     description: String
+    Tags: [String]
+    isPrivate: Boolean!
+    isAdult: Boolean!
+    isExternalCutout: Boolean!
+    isAd: Boolean!
+    ads: [Ad] @goField(forceResolver: true)
     createdAt: DateTime!
     updatedAt: DateTime!
     uploader: User! @goField(forceResolver: true)
@@ -18,6 +24,12 @@ type VideoPayload {
     title: String!
     thumbnailImageURL: String!
     description: String
+    tags: [String]
+    isPrivate: Boolean!
+    isAdult: Boolean!
+    isExternalCutout: Boolean!
+    isAd: Boolean!
+    ads: [Ad] @goField(forceResolver: true)
     createdAt: DateTime!
     updatedAt: DateTime!
     uploader: User! @goField(forceResolver: true)
@@ -28,6 +40,11 @@ input UploadVideoInput {
     thumbnailImage: Upload
     title: String!
     description: String
+    tags: [String]
+    isPrivate: Boolean!
+    isAdult: Boolean!
+    isExternalCutout: Boolean!
+    isAds: Boolean!
 }
 
 extend type Query {

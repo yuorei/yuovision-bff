@@ -89,6 +89,10 @@ func (a *Application) UploadVideo(ctx context.Context, video *domain.UploadVideo
 		ThumbnailImageURL: imageURL,
 		Title:             video.Title,
 		Description:       video.Description,
+		IsPrivate:         video.IsPrivate,
+		IsAdult:           video.IsAdult,
+		IsExternalCutout:  video.IsExternalCutout,
+		IsAd:              video.IsAd,
 		UploaderID:        userID,
 	}
 

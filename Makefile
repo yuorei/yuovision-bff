@@ -5,6 +5,9 @@ gen:
 	./shell/gen.sh
 	./shell/fmt.sh
 
+lint:
+	./shell/lint.sh
+
 build:
 	docker compose build
 
