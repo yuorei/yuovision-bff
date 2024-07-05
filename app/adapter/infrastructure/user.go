@@ -3,7 +3,7 @@ package infrastructure
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 
@@ -16,7 +16,7 @@ func (i *Infrastructure) GetUserFromDB(ctx context.Context, id string) (*domain.
 	if err != nil {
 		return nil, err
 	}
-	user := domain.NewUser(userPayload.Id, userPayload.Name, userPayload.ProfileImageUrl, userPayload.SubscribeChannelIds)
+	user := domain.NewUser(userPayload.Id, userPayload.Name, userPayload.ProfileImageUrl, userPayload.SubscribeChannelIds, userPayload.IsSubscribed, userPayload.Role.String())
 	return user, nil
 }
 
@@ -25,13 +25,16 @@ func (i *Infrastructure) InsertUser(ctx context.Context, user *domain.User) (*do
 		Id:              user.ID,
 		Name:            user.Name,
 		ProfileImageUrl: user.ProfileImageURL,
+		IsSubscribed:    false,
+		Role:            video_grpc.Role_NORMAL,
 	}
 
 	userPayload, err := i.gRPCClient.UserClient.RegisterUser(ctx, userInput)
 	if err != nil {
 		return nil, err
 	}
-	user = domain.NewUser(userPayload.Id, userPayload.Name, userPayload.ProfileImageUrl, userPayload.SubscribeChannelIds)
+
+	user = domain.NewUser(userPayload.Id, userPayload.Name, userPayload.ProfileImageUrl, userPayload.SubscribeChannelIds, userPayload.IsSubscribed, userPayload.Role.String())
 	return user, nil
 }
 
@@ -43,7 +46,7 @@ func (i *Infrastructure) GetProfileImageURL(ctx context.Context, id string) (str
 	defer resp.Body.Close()
 
 	// レスポンスの処理
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
