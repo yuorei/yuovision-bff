@@ -1,57 +1,69 @@
 scalar Upload
 scalar DateTime
 
-type Video implements Node{
-    id: ID! @goField(forceResolver: true)
-    videoURL: String!
-    title: String!
-    thumbnailImageURL: String!
-    description: String
-    Tags: [String]
-    isPrivate: Boolean!
-    isAdult: Boolean!
-    isExternalCutout: Boolean!
-    isAd: Boolean!
-    ads: [Ad] @goField(forceResolver: true)
-    createdAt: DateTime!
-    updatedAt: DateTime!
-    uploader: User! @goField(forceResolver: true)
+type Video implements Node {
+  id: ID! @goField(forceResolver: true)
+  videoURL: String!
+  title: String!
+  thumbnailImageURL: String!
+  description: String
+  Tags: [String]
+  isPrivate: Boolean!
+  isAdult: Boolean!
+  isExternalCutout: Boolean!
+  isAd: Boolean!
+  ads: [Ad] @goField(forceResolver: true)
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  uploader: User! @goField(forceResolver: true)
 }
 
 type VideoPayload {
-    id: ID! @goField(forceResolver: true)
-    videoURL: String!
-    title: String!
-    thumbnailImageURL: String!
-    description: String
-    tags: [String]
-    isPrivate: Boolean!
-    isAdult: Boolean!
-    isExternalCutout: Boolean!
-    isAd: Boolean!
-    ads: [Ad] @goField(forceResolver: true)
-    createdAt: DateTime!
-    updatedAt: DateTime!
-    uploader: User! @goField(forceResolver: true)
+  id: ID! @goField(forceResolver: true)
+  videoURL: String!
+  title: String!
+  thumbnailImageURL: String!
+  description: String
+  tags: [String]
+  isPrivate: Boolean!
+  isAdult: Boolean!
+  isExternalCutout: Boolean!
+  isAd: Boolean!
+  ads: [Ad] @goField(forceResolver: true)
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  uploader: User! @goField(forceResolver: true)
+}
+
+type IncrementWatchCountPayload {
+  videoID: ID!
+  watchCount: Int!
 }
 
 input UploadVideoInput {
-    video: Upload!
-    thumbnailImage: Upload
-    title: String!
-    description: String
-    tags: [String]
-    isPrivate: Boolean!
-    isAdult: Boolean!
-    isExternalCutout: Boolean!
-    isAds: Boolean!
+  video: Upload!
+  thumbnailImage: Upload
+  title: String!
+  description: String
+  tags: [String]
+  isPrivate: Boolean!
+  isAdult: Boolean!
+  isExternalCutout: Boolean!
+  isAds: Boolean!
+}
+
+input IncrementWatchCountInput {
+  VideoID: ID!
+  UserID: ID!
 }
 
 extend type Query {
-    videos: [Video!]!
-    video(id: ID!): Video!
+  videos: [Video!]!
+  video(id: ID!): Video!
+  watchCount(videoID: ID!): Int!
 }
 
 extend type Mutation {
-    UploadVideo(input: UploadVideoInput!): VideoPayload!
+  UploadVideo(input: UploadVideoInput!): VideoPayload!
+  IncrementWatchCount(input: IncrementWatchCountInput!): VideoPayload!
 }
