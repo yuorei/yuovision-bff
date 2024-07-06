@@ -40,6 +40,10 @@ type IncrementWatchCountPayload {
   watchCount: Int!
 }
 
+type CutVideoPayload {
+  cutVideoURL: String!
+}
+
 input UploadVideoInput {
   video: Upload!
   thumbnailImage: Upload
@@ -57,10 +61,18 @@ input IncrementWatchCountInput {
   UserID: ID!
 }
 
+input CutVideoInput {
+  VideoID: ID!
+  UserID: ID!
+  StartTime: Int!
+  EndTime: Int!
+}
+
 extend type Query {
   videos: [Video!]!
   video(id: ID!): Video!
   watchCount(videoID: ID!): Int!
+  cutVideo(CutVideoInput: CutVideoInput!): CutVideoPayload!
 }
 
 extend type Mutation {
