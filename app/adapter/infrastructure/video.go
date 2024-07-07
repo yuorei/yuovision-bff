@@ -142,3 +142,17 @@ func (i *Infrastructure) IncrementWatchCount(ctx context.Context, videoID, userI
 
 	return int(videoWatchCount.Count), nil
 }
+
+func (i *Infrastructure) CutVideo(ctx context.Context, videoID, userID string, start, end int) (string, error) {
+	cutVideoPayload, err := i.gRPCClient.VideoClient.CutVideo(ctx, &video_grpc.CutVideoInput{
+		VideoId: videoID,
+		UserId:  userID,
+		Start:   int32(start),
+		End:     int32(end),
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return cutVideoPayload.VideoUrl, nil
+}

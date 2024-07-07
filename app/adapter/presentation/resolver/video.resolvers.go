@@ -132,7 +132,13 @@ func (r *queryResolver) WatchCount(ctx context.Context, videoID string) (int, er
 
 // CutVideo is the resolver for the cutVideo field.
 func (r *queryResolver) CutVideo(ctx context.Context, cutVideoInput model.CutVideoInput) (*model.CutVideoPayload, error) {
-	panic(fmt.Errorf("not implemented: CutVideo - cutVideo"))
+	cutVideoURL, err := r.usecase.CutVideo(ctx, cutVideoInput.VideoID, cutVideoInput.StartTime, cutVideoInput.EndTime)
+	if err != nil {
+		return nil, err
+	}
+	return &model.CutVideoPayload{
+		CutVideoURL: cutVideoURL,
+	}, nil
 }
 
 // ID is the resolver for the id field.

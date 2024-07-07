@@ -115,3 +115,12 @@ func (a *Application) IncrementWatchCount(ctx context.Context, videoID, userID s
 
 	return a.Video.videoRepository.IncrementWatchCount(ctx, videoID, userID)
 }
+
+func (a *Application) CutVideo(ctx context.Context, videoID string, start, end int) (string, error) {
+	userID, err := middleware.GetUserIDFromContext(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return a.Video.videoRepository.CutVideo(ctx, videoID, userID, start, end)
+}

@@ -42,7 +42,6 @@ func (this Comment) GetID() string { return this.ID }
 
 type CutVideoInput struct {
 	VideoID   string `json:"VideoID"`
-	UserID    string `json:"UserID"`
 	StartTime int    `json:"StartTime"`
 	EndTime   int    `json:"EndTime"`
 }
