@@ -62,7 +62,6 @@ input IncrementWatchCountInput {
 
 input CutVideoInput {
   VideoID: ID!
-  UserID: ID!
   StartTime: Int!
   EndTime: Int!
 }
