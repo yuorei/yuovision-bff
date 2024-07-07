@@ -40,6 +40,26 @@ type Comment struct {
 func (Comment) IsNode()            {}
 func (this Comment) GetID() string { return this.ID }
 
+type CutVideoInput struct {
+	VideoID   string `json:"VideoID"`
+	UserID    string `json:"UserID"`
+	StartTime int    `json:"StartTime"`
+	EndTime   int    `json:"EndTime"`
+}
+
+type CutVideoPayload struct {
+	CutVideoURL string `json:"cutVideoURL"`
+}
+
+type IncrementWatchCountInput struct {
+	VideoID string `json:"VideoID"`
+	UserID  string `json:"UserID"`
+}
+
+type IncrementWatchCountPayload struct {
+	WatchCount int `json:"watchCount"`
+}
+
 type Mutation struct {
 }
 

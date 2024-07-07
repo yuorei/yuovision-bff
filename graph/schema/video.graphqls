@@ -36,7 +36,6 @@ type VideoPayload {
 }
 
 type IncrementWatchCountPayload {
-  videoID: ID!
   watchCount: Int!
 }
 
@@ -77,5 +76,5 @@ extend type Query {
 
 extend type Mutation {
   UploadVideo(input: UploadVideoInput!): VideoPayload!
-  IncrementWatchCount(input: IncrementWatchCountInput!): VideoPayload!
+  IncrementWatchCount(input: IncrementWatchCountInput!): IncrementWatchCountPayload!
 }

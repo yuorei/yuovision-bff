@@ -53,6 +53,18 @@ func (r *mutationResolver) UploadVideo(ctx context.Context, input model.UploadVi
 	}, nil
 }
 
+// IncrementWatchCount is the resolver for the IncrementWatchCount field.
+func (r *mutationResolver) IncrementWatchCount(ctx context.Context, input model.IncrementWatchCountInput) (*model.IncrementWatchCountPayload, error) {
+	watchCount, err := r.usecase.IncrementWatchCount(ctx, input.VideoID, input.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.IncrementWatchCountPayload{
+		WatchCount: watchCount,
+	}, nil
+}
+
 // Videos is the resolver for the videos field.
 func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
 	videos, err := r.usecase.GetVideos(ctx)
@@ -107,6 +119,20 @@ func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, err
 			ID: video.UploaderID,
 		},
 	}, nil
+}
+
+// WatchCount is the resolver for the watchCount field.
+func (r *queryResolver) WatchCount(ctx context.Context, videoID string) (int, error) {
+	watchCount, err := r.usecase.GetWatchCount(ctx, videoID)
+	if err != nil {
+		return 0, err
+	}
+	return watchCount, nil
+}
+
+// CutVideo is the resolver for the cutVideo field.
+func (r *queryResolver) CutVideo(ctx context.Context, cutVideoInput model.CutVideoInput) (*model.CutVideoPayload, error) {
+	panic(fmt.Errorf("not implemented: CutVideo - cutVideo"))
 }
 
 // ID is the resolver for the id field.

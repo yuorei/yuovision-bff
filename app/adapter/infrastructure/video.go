@@ -31,7 +31,7 @@ func (i *Infrastructure) GetVideosFromDB(ctx context.Context) ([]*domain.Video, 
 	for _, video := range videosResponse.Videos {
 		videos = append(videos, domain.NewVideo(video.Id, video.VideoUrl, video.ThumbnailImageUrl, video.Title, &video.Description, video.Tags, video.Private, video.Adult, video.ExternalCutout, video.IsAd, video.UserId, video.CreatedAt.AsTime(), video.UpdatedAt.AsTime()))
 	}
-	err = setToRedis(ctx, i.redis, key, 1*time.Microsecond, videos)
+	err = setToRedis(ctx, i.redis, key, 1*time.Minute, videos)
 	if err != nil {
 		return nil, err
 	}
@@ -123,4 +123,22 @@ func (i *Infrastructure) UploadVideoForStorage(ctx context.Context, video *domai
 	}
 
 	return videoPayload.VideoUrl, nil
+}
+
+func (i *Infrastructure) GetWatchCount(ctx context.Context, videoID string) (int, error) {
+	videoWatchCount, err := i.gRPCClient.VideoClient.WatchCount(ctx, &video_grpc.WatchCountInput{VideoId: videoID})
+	if err != nil {
+		return 0, err
+	}
+
+	return int(videoWatchCount.Count), nil
+}
+
+func (i *Infrastructure) IncrementWatchCount(ctx context.Context, videoID, userID string) (int, error) {
+	videoWatchCount, err := i.gRPCClient.VideoClient.IncrementWatchCount(ctx, &video_grpc.IncrementWatchCountInput{VideoId: videoID, UserId: userID})
+	if err != nil {
+		return 0, err
+	}
+
+	return int(videoWatchCount.Count), nil
 }
