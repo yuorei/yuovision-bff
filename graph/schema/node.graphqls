@@ -2,6 +2,6 @@ interface Node {
   id: ID! @goField(forceResolver: true)
 }
 
-type Query{
+type Query {
   node(id: ID!): Node!
 }

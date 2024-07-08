@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/yuorei/video-server/app/application/port"
 	"github.com/yuorei/video-server/app/domain"
@@ -97,4 +98,25 @@ func (a *Application) UploadVideo(ctx context.Context, video *domain.UploadVideo
 	}
 
 	return videoResponse, nil
+}
+
+func (a *Application) GetWatchCount(ctx context.Context, videoID string) (int, error) {
+	return a.Video.videoRepository.GetWatchCount(ctx, videoID)
+}
+
+func (a *Application) IncrementWatchCount(ctx context.Context, videoID, userID string) (int, error) {
+	if !strings.Contains(userID, "client") {
+		return 0, fmt.Errorf("not client")
+	}
+
+	return a.Video.videoRepository.IncrementWatchCount(ctx, videoID, userID)
+}
+
+func (a *Application) CutVideo(ctx context.Context, videoID string, start, end int) (string, error) {
+	userID, err := middleware.GetUserIDFromContext(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return a.Video.videoRepository.CutVideo(ctx, videoID, userID, start, end)
 }

@@ -14,6 +14,7 @@ type (
 		Title             string
 		Description       *string
 		Tags              []string
+		WatchCount        int
 		IsPrivate         bool
 		IsAdult           bool
 		IsExternalCutout  bool
@@ -70,7 +71,7 @@ func NewVideoID() string {
 	return fmt.Sprintf("%s%s%s", "video", IDSeparator, NewUUID())
 }
 
-func NewVideo(id string, videoURL string, thumbnailImageURL string, title string, description *string, tags []string, private bool, adult bool, externalCutout bool, isAd bool, uploaderID string, createdAt time.Time, updatedAt time.Time) *Video {
+func NewVideo(id string, videoURL string, thumbnailImageURL string, title string, description *string, tags []string, watchCount int, private bool, adult bool, externalCutout bool, isAd bool, uploaderID string, createdAt time.Time, updatedAt time.Time) *Video {
 	return &Video{
 		ID:                id,
 		VideoURL:          videoURL,
@@ -85,6 +86,7 @@ func NewVideo(id string, videoURL string, thumbnailImageURL string, title string
 		UploaderID:        uploaderID,
 		CreatedAt:         createdAt,
 		UpdatedAt:         updatedAt,
+		WatchCount:        watchCount,
 	}
 }
 

@@ -29,9 +29,9 @@ func (i *Infrastructure) GetVideosFromDB(ctx context.Context) ([]*domain.Video, 
 	}
 	videos = make([]*domain.Video, 0, len(videosResponse.Videos))
 	for _, video := range videosResponse.Videos {
-		videos = append(videos, domain.NewVideo(video.Id, video.VideoUrl, video.ThumbnailImageUrl, video.Title, &video.Description, video.Tags, video.Private, video.Adult, video.ExternalCutout, video.IsAd, video.UserId, video.CreatedAt.AsTime(), video.UpdatedAt.AsTime()))
+		videos = append(videos, domain.NewVideo(video.Id, video.VideoUrl, video.ThumbnailImageUrl, video.Title, &video.Description, video.Tags, int(video.WatchCount), video.Private, video.Adult, video.ExternalCutout, video.IsAd, video.UserId, video.CreatedAt.AsTime(), video.UpdatedAt.AsTime()))
 	}
-	err = setToRedis(ctx, i.redis, key, 1*time.Microsecond, videos)
+	err = setToRedis(ctx, i.redis, key, 1*time.Minute, videos)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (i *Infrastructure) GetVideosByUserIDFromDB(ctx context.Context, userID str
 	}
 	videos := make([]*domain.Video, 0, len(videoResponse.Videos))
 	for _, video := range videoResponse.Videos {
-		videos = append(videos, domain.NewVideo(video.Id, video.VideoUrl, video.ThumbnailImageUrl, video.Title, &video.Description, video.Tags, video.Private, video.Adult, video.ExternalCutout, video.IsAd, video.UserId, video.CreatedAt.AsTime(), video.UpdatedAt.AsTime()))
+		videos = append(videos, domain.NewVideo(video.Id, video.VideoUrl, video.ThumbnailImageUrl, video.Title, &video.Description, video.Tags, int(video.WatchCount), video.Private, video.Adult, video.ExternalCutout, video.IsAd, video.UserId, video.CreatedAt.AsTime(), video.UpdatedAt.AsTime()))
 	}
 	return videos, nil
 }
@@ -57,7 +57,7 @@ func (i *Infrastructure) GetVideoFromDB(ctx context.Context, id string) (*domain
 		return nil, err
 	}
 
-	video := domain.NewVideo(videoPayload.Id, videoPayload.VideoUrl, videoPayload.ThumbnailImageUrl, videoPayload.Title, &videoPayload.Description, videoPayload.Tags, videoPayload.Private, videoPayload.Adult, videoPayload.ExternalCutout, videoPayload.IsAd, videoPayload.UserId, videoPayload.CreatedAt.AsTime(), videoPayload.UpdatedAt.AsTime())
+	video := domain.NewVideo(videoPayload.Id, videoPayload.VideoUrl, videoPayload.ThumbnailImageUrl, videoPayload.Title, &videoPayload.Description, videoPayload.Tags, int(videoPayload.WatchCount), videoPayload.Private, videoPayload.Adult, videoPayload.ExternalCutout, videoPayload.IsAd, videoPayload.UserId, videoPayload.CreatedAt.AsTime(), videoPayload.UpdatedAt.AsTime())
 	return video, nil
 }
 
@@ -123,4 +123,36 @@ func (i *Infrastructure) UploadVideoForStorage(ctx context.Context, video *domai
 	}
 
 	return videoPayload.VideoUrl, nil
+}
+
+func (i *Infrastructure) GetWatchCount(ctx context.Context, videoID string) (int, error) {
+	videoWatchCount, err := i.gRPCClient.VideoClient.WatchCount(ctx, &video_grpc.WatchCountInput{VideoId: videoID})
+	if err != nil {
+		return 0, err
+	}
+
+	return int(videoWatchCount.Count), nil
+}
+
+func (i *Infrastructure) IncrementWatchCount(ctx context.Context, videoID, userID string) (int, error) {
+	videoWatchCount, err := i.gRPCClient.VideoClient.IncrementWatchCount(ctx, &video_grpc.IncrementWatchCountInput{VideoId: videoID, UserId: userID})
+	if err != nil {
+		return 0, err
+	}
+
+	return int(videoWatchCount.Count), nil
+}
+
+func (i *Infrastructure) CutVideo(ctx context.Context, videoID, userID string, start, end int) (string, error) {
+	cutVideoPayload, err := i.gRPCClient.VideoClient.CutVideo(ctx, &video_grpc.CutVideoInput{
+		VideoId: videoID,
+		UserId:  userID,
+		Start:   int32(start),
+		End:     int32(end),
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return cutVideoPayload.VideoUrl, nil
 }

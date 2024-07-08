@@ -53,6 +53,18 @@ func (r *mutationResolver) UploadVideo(ctx context.Context, input model.UploadVi
 	}, nil
 }
 
+// IncrementWatchCount is the resolver for the IncrementWatchCount field.
+func (r *mutationResolver) IncrementWatchCount(ctx context.Context, input model.IncrementWatchCountInput) (*model.IncrementWatchCountPayload, error) {
+	watchCount, err := r.usecase.IncrementWatchCount(ctx, input.VideoID, input.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.IncrementWatchCountPayload{
+		WatchCount: watchCount,
+	}, nil
+}
+
 // Videos is the resolver for the videos field.
 func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
 	videos, err := r.usecase.GetVideos(ctx)
@@ -69,6 +81,7 @@ func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
 			Title:             video.Title,
 			Description:       video.Description,
 			Tags:              lib.StringsToPointers(video.Tags),
+			WatchCount:        video.WatchCount,
 			IsPrivate:         video.IsPrivate,
 			IsAdult:           video.IsAdult,
 			IsExternalCutout:  video.IsExternalCutout,
@@ -96,6 +109,7 @@ func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, err
 		Title:             video.Title,
 		Description:       video.Description,
 		Tags:              lib.StringsToPointers(video.Tags),
+		WatchCount:        video.WatchCount,
 		IsPrivate:         video.IsPrivate,
 		IsAdult:           video.IsAdult,
 		IsExternalCutout:  video.IsExternalCutout,
@@ -106,6 +120,27 @@ func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, err
 		Uploader: &model.User{
 			ID: video.UploaderID,
 		},
+	}, nil
+}
+
+// WatchCount is the resolver for the watchCount field.
+func (r *queryResolver) WatchCount(ctx context.Context, videoID string) (int, error) {
+	watchCount, err := r.usecase.GetWatchCount(ctx, videoID)
+	if err != nil {
+		return 0, err
+	}
+	return watchCount, nil
+}
+
+// CutVideo is the resolver for the cutVideo field.
+func (r *queryResolver) CutVideo(ctx context.Context, input model.CutVideoInput) (*model.CutVideoPayload, error) {
+	cutVideoURL, err := r.usecase.CutVideo(ctx, input.VideoID, input.StartTime, input.EndTime)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.CutVideoPayload{
+		CutVideoURL: cutVideoURL,
 	}, nil
 }
 

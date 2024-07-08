@@ -40,6 +40,25 @@ type Comment struct {
 func (Comment) IsNode()            {}
 func (this Comment) GetID() string { return this.ID }
 
+type CutVideoInput struct {
+	VideoID   string `json:"VideoID"`
+	StartTime int    `json:"StartTime"`
+	EndTime   int    `json:"EndTime"`
+}
+
+type CutVideoPayload struct {
+	CutVideoURL string `json:"cutVideoURL"`
+}
+
+type IncrementWatchCountInput struct {
+	VideoID string `json:"VideoID"`
+	UserID  string `json:"UserID"`
+}
+
+type IncrementWatchCountPayload struct {
+	WatchCount int `json:"watchCount"`
+}
+
 type Mutation struct {
 }
 
@@ -115,6 +134,7 @@ type Video struct {
 	IsAdult           bool      `json:"isAdult"`
 	IsExternalCutout  bool      `json:"isExternalCutout"`
 	IsAd              bool      `json:"isAd"`
+	WatchCount        int       `json:"watchCount"`
 	Ads               []*Ad     `json:"ads,omitempty"`
 	CreatedAt         string    `json:"createdAt"`
 	UpdatedAt         string    `json:"updatedAt"`
@@ -135,6 +155,7 @@ type VideoPayload struct {
 	IsAdult           bool      `json:"isAdult"`
 	IsExternalCutout  bool      `json:"isExternalCutout"`
 	IsAd              bool      `json:"isAd"`
+	WatchCount        int       `json:"watchCount"`
 	Ads               []*Ad     `json:"ads,omitempty"`
 	CreatedAt         string    `json:"createdAt"`
 	UpdatedAt         string    `json:"updatedAt"`

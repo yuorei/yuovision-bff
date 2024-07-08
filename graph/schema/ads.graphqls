@@ -1,9 +1,9 @@
-type Ad implements Node{
-    id: ID! @goField(forceResolver: true)
-    title: String!
-    description: String
-    imageURL: String!
-    link: String!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+type Ad implements Node {
+  id: ID! @goField(forceResolver: true)
+  title: String!
+  description: String
+  imageURL: String!
+  link: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
