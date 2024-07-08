@@ -134,6 +134,7 @@ type Video struct {
 	IsAdult           bool      `json:"isAdult"`
 	IsExternalCutout  bool      `json:"isExternalCutout"`
 	IsAd              bool      `json:"isAd"`
+	WatchCount        int       `json:"watchCount"`
 	Ads               []*Ad     `json:"ads,omitempty"`
 	CreatedAt         string    `json:"createdAt"`
 	UpdatedAt         string    `json:"updatedAt"`
@@ -154,6 +155,7 @@ type VideoPayload struct {
 	IsAdult           bool      `json:"isAdult"`
 	IsExternalCutout  bool      `json:"isExternalCutout"`
 	IsAd              bool      `json:"isAd"`
+	WatchCount        int       `json:"watchCount"`
 	Ads               []*Ad     `json:"ads,omitempty"`
 	CreatedAt         string    `json:"createdAt"`
 	UpdatedAt         string    `json:"updatedAt"`

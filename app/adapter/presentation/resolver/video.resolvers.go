@@ -81,6 +81,7 @@ func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
 			Title:             video.Title,
 			Description:       video.Description,
 			Tags:              lib.StringsToPointers(video.Tags),
+			WatchCount:        video.WatchCount,
 			IsPrivate:         video.IsPrivate,
 			IsAdult:           video.IsAdult,
 			IsExternalCutout:  video.IsExternalCutout,
@@ -108,6 +109,7 @@ func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, err
 		Title:             video.Title,
 		Description:       video.Description,
 		Tags:              lib.StringsToPointers(video.Tags),
+		WatchCount:        video.WatchCount,
 		IsPrivate:         video.IsPrivate,
 		IsAdult:           video.IsAdult,
 		IsExternalCutout:  video.IsExternalCutout,
@@ -131,11 +133,12 @@ func (r *queryResolver) WatchCount(ctx context.Context, videoID string) (int, er
 }
 
 // CutVideo is the resolver for the cutVideo field.
-func (r *queryResolver) CutVideo(ctx context.Context, cutVideoInput model.CutVideoInput) (*model.CutVideoPayload, error) {
-	cutVideoURL, err := r.usecase.CutVideo(ctx, cutVideoInput.VideoID, cutVideoInput.StartTime, cutVideoInput.EndTime)
+func (r *queryResolver) CutVideo(ctx context.Context, input model.CutVideoInput) (*model.CutVideoPayload, error) {
+	cutVideoURL, err := r.usecase.CutVideo(ctx, input.VideoID, input.StartTime, input.EndTime)
 	if err != nil {
 		return nil, err
 	}
+
 	return &model.CutVideoPayload{
 		CutVideoURL: cutVideoURL,
 	}, nil

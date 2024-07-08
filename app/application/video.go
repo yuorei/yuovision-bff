@@ -105,12 +105,8 @@ func (a *Application) GetWatchCount(ctx context.Context, videoID string) (int, e
 }
 
 func (a *Application) IncrementWatchCount(ctx context.Context, videoID, userID string) (int, error) {
-	if strings.Contains(userID, "unauthorized") {
-		var err error
-		userID, err = middleware.GetUserIDFromContext(ctx)
-		if err != nil {
-			return 0, err
-		}
+	if !strings.Contains(userID, "client") {
+		return 0, fmt.Errorf("not client")
 	}
 
 	return a.Video.videoRepository.IncrementWatchCount(ctx, videoID, userID)
