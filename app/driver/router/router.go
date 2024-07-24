@@ -33,7 +33,7 @@ func NewRouter() {
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
 	corsOpts := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
+		AllowedOrigins: []string{"https://*.yuorei.com"},
 		// Logger:         log.New(os.Stdout, "video-server", log.LstdFlags),
 		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},
 		AllowedHeaders: []string{"*"},
