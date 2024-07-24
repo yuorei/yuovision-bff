@@ -40,9 +40,18 @@ func NewRouter() {
 	})
 
 	router := mux.NewRouter()
+
 	router.Use(middleware.Middleware())
+	router.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
 	router.PathPrefix("/graphql").Handler(corsOpts.Handler(srv))
-	router.PathPrefix("/").Handler(playground.Handler("GraphQL playground", "/graphql"))
+	if os.Getenv("DEV") == "dev" {
+		router.PathPrefix("/").Handler(playground.Handler("GraphQL playground", "/graphql"))
+	}
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
+}
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
