@@ -8,6 +8,7 @@ type UseCase struct {
 	port.VideoInputPort
 	port.UserInputPort
 	port.CommentInputPort
+	port.AdInputPort
 }
 
 func NewUseCase(application *Application) *UseCase {
@@ -15,5 +16,6 @@ func NewUseCase(application *Application) *UseCase {
 		VideoInputPort:   application,
 		UserInputPort:    application,
 		CommentInputPort: application,
+		AdInputPort:      application,
 	}
 }

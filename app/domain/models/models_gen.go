@@ -15,18 +15,40 @@ type Node interface {
 	GetID() string
 }
 
-type Ad struct {
-	ID          string  `json:"id"`
-	Title       string  `json:"title"`
-	Description *string `json:"description,omitempty"`
-	ImageURL    string  `json:"imageURL"`
-	Link        string  `json:"link"`
-	CreatedAt   string  `json:"createdAt"`
-	UpdatedAt   string  `json:"updatedAt"`
+type AdVideoInput struct {
+	// ブラウザ情報
+	UserAgent            string  `json:"userAgent"`
+	Platform             string  `json:"platform"`
+	Language             string  `json:"language"`
+	URL                  string  `json:"url"`
+	PageTitle            string  `json:"pageTitle"`
+	Referrer             *string `json:"referrer,omitempty"`
+	NetworkDownlink      *string `json:"networkDownlink,omitempty"`
+	NetworkEffectiveType *string `json:"networkEffectiveType,omitempty"`
+	IPAddress            string  `json:"ipAddress"`
+	Location             string  `json:"location"`
+	Hostname             string  `json:"hostname"`
+	City                 string  `json:"city"`
+	Region               string  `json:"region"`
+	Country              string  `json:"country"`
+	Org                  string  `json:"org"`
+	Postal               string  `json:"postal"`
+	Timezone             string  `json:"timezone"`
+	// ビデオ情報
+	VideoID string `json:"videoID"`
+	// ユーザー情報
+	UserID   string `json:"userID"`
+	ClientID string `json:"clientID"`
 }
 
-func (Ad) IsNode()            {}
-func (this Ad) GetID() string { return this.ID }
+type AdVideoPayload struct {
+	AdID         string `json:"adID"`
+	AdURL        string `json:"adURL"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	ThumbnailURL string `json:"thumbnailURL"`
+	VideoURL     string `json:"videoURL"`
+}
 
 type Comment struct {
 	ID        string `json:"id"`
@@ -135,7 +157,6 @@ type Video struct {
 	IsExternalCutout  bool      `json:"isExternalCutout"`
 	IsAd              bool      `json:"isAd"`
 	WatchCount        int       `json:"watchCount"`
-	Ads               []*Ad     `json:"ads,omitempty"`
 	CreatedAt         string    `json:"createdAt"`
 	UpdatedAt         string    `json:"updatedAt"`
 	Uploader          *User     `json:"uploader"`
@@ -156,10 +177,37 @@ type VideoPayload struct {
 	IsExternalCutout  bool      `json:"isExternalCutout"`
 	IsAd              bool      `json:"isAd"`
 	WatchCount        int       `json:"watchCount"`
-	Ads               []*Ad     `json:"ads,omitempty"`
 	CreatedAt         string    `json:"createdAt"`
 	UpdatedAt         string    `json:"updatedAt"`
 	Uploader          *User     `json:"uploader"`
+}
+
+type WatchCountAdVideoInput struct {
+	// ブラウザ情報
+	UserAgent            string  `json:"userAgent"`
+	Platform             string  `json:"platform"`
+	Language             string  `json:"language"`
+	URL                  string  `json:"url"`
+	PageTitle            string  `json:"pageTitle"`
+	Referrer             *string `json:"referrer,omitempty"`
+	NetworkDownlink      *string `json:"networkDownlink,omitempty"`
+	NetworkEffectiveType *string `json:"networkEffectiveType,omitempty"`
+	IPAddress            string  `json:"ipAddress"`
+	Location             string  `json:"location"`
+	Hostname             string  `json:"hostname"`
+	City                 string  `json:"city"`
+	Region               string  `json:"region"`
+	Country              string  `json:"country"`
+	Org                  string  `json:"org"`
+	Postal               string  `json:"postal"`
+	Timezone             string  `json:"timezone"`
+	// ビデオ情報
+	VideoID string `json:"videoID"`
+	// ユーザー情報
+	UserID   string `json:"userID"`
+	ClientID string `json:"clientID"`
+	// 広告情報
+	AdID string `json:"adID"`
 }
 
 type SubscribeChannelInput struct {

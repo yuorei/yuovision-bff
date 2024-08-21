@@ -1,8 +1,9 @@
 module github.com/yuorei/video-server
 
-go 1.22.2
+go 1.22.4
 
 require (
+	connectrpc.com/connect v1.16.2
 	github.com/99designs/gqlgen v0.17.46
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/mock v1.6.0
@@ -12,6 +13,7 @@ require (
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/rs/cors v1.11.0
 	github.com/vektah/gqlparser/v2 v2.5.11
+	github.com/yuorei/yuorei-ads-proto v0.0.0-20240820025554-738a1488a73e
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.34.0
 )
