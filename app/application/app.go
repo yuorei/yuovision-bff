@@ -9,6 +9,7 @@ type Application struct {
 	Image   *ImageUseCase
 	User    *UserUseCase
 	Comment *CommentUseCase
+	Ad      *AdUseCase
 }
 
 func NewApplication(infra *infrastructure.Infrastructure) *Application {
@@ -16,11 +17,13 @@ func NewApplication(infra *infrastructure.Infrastructure) *Application {
 	imageUseCase := NewImageUseCase(infra)
 	userUseCase := NewUserUseCase(infra)
 	CommentUseCase := NewCommentUseCase(infra)
+	AdUseCase := NewAdUseCase(infra)
 
 	return &Application{
 		Video:   videoUseCase,
 		Image:   imageUseCase,
 		User:    userUseCase,
 		Comment: CommentUseCase,
+		Ad:      AdUseCase,
 	}
 }
