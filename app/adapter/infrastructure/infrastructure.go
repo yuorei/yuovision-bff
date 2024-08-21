@@ -9,11 +9,13 @@ import (
 type Infrastructure struct {
 	redis      *redis.Client
 	gRPCClient *client.Client
+	adsServer  *client.AdsServer
 }
 
 func NewInfrastructure() *Infrastructure {
 	return &Infrastructure{
 		redis:      r.ConnectRedis(),
 		gRPCClient: client.NewClient(),
+		adsServer:  client.NewClientAdServer(),
 	}
 }
