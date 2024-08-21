@@ -6,7 +6,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	"github.com/yuorei/video-server/app/domain"
@@ -114,7 +113,6 @@ func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, err
 		IsAdult:           video.IsAdult,
 		IsExternalCutout:  video.IsExternalCutout,
 		IsAd:              video.IsAd,
-		Ads:               nil,
 		CreatedAt:         video.CreatedAt.String(),
 		UpdatedAt:         video.CreatedAt.String(),
 		Uploader: &model.User{
@@ -149,11 +147,6 @@ func (r *videoResolver) ID(ctx context.Context, obj *model.Video) (string, error
 	return obj.ID, nil
 }
 
-// Ads is the resolver for the Ads field.
-func (r *videoResolver) Ads(ctx context.Context, obj *model.Video) ([]*model.Ad, error) {
-	panic(fmt.Errorf("not implemented: Ads - Ads"))
-}
-
 // Uploader is the resolver for the uploader field.
 func (r *videoResolver) Uploader(ctx context.Context, obj *model.Video) (*model.User, error) {
 	user, err := r.usecase.GetUser(ctx, obj.Uploader.ID)
@@ -173,11 +166,6 @@ func (r *videoResolver) Uploader(ctx context.Context, obj *model.Video) (*model.
 // ID is the resolver for the id field.
 func (r *videoPayloadResolver) ID(ctx context.Context, obj *model.VideoPayload) (string, error) {
 	return obj.ID, nil
-}
-
-// Ads is the resolver for the Ads field.
-func (r *videoPayloadResolver) Ads(ctx context.Context, obj *model.VideoPayload) ([]*model.Ad, error) {
-	panic(fmt.Errorf("not implemented: Ads - Ads"))
 }
 
 // Uploader is the resolver for the uploader field.

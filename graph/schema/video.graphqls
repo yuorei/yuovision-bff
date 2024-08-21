@@ -13,7 +13,6 @@ type Video implements Node {
   isExternalCutout: Boolean!
   isAd: Boolean!
   watchCount: Int!
-  ads: [Ad] @goField(forceResolver: true)
   createdAt: DateTime!
   updatedAt: DateTime!
   uploader: User! @goField(forceResolver: true)
@@ -31,7 +30,6 @@ type VideoPayload {
   isExternalCutout: Boolean!
   isAd: Boolean!
   watchCount: Int!
-  ads: [Ad] @goField(forceResolver: true)
   createdAt: DateTime!
   updatedAt: DateTime!
   uploader: User! @goField(forceResolver: true)
