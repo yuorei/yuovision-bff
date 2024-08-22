@@ -58,6 +58,46 @@ func (i *Infrastructure) GetAdsByVideoIDFromAdsServer(ctx context.Context, req *
 	return adsResponse, nil
 }
 
-func (i *Infrastructure) WatchCountAdVideoFromAdsServer(ctx context.Context, postAd *domain.Ad) (*domain.Ad, error) {
-	return nil, nil
+func (i *Infrastructure) WatchCountAdVideoFromAdsServer(ctx context.Context, req *domain.WatchCountAdVideoRequest) error {
+	if req.Description == nil {
+		req.Description = new(string)
+	}
+
+	_, err := i.adsServer.ClientAds.WatchCountAdVideo(ctx,
+		connect.NewRequest(&adsv1.WatchCountAdVideoRequest{
+			// ブラウザ情報
+			UserAgent:            req.UserAgent,
+			Platform:             req.Platform,
+			Language:             req.Language,
+			Url:                  req.URL,
+			PageTitle:            req.PageTitle,
+			Referrer:             req.Referrer,
+			NetworkDownlink:      req.NetworkDownlink,
+			NetworkEffectiveType: req.NetworkEffectiveType,
+			IpAddress:            req.IPAddress,
+			Location:             req.Location,
+			Hostname:             req.Hostname,
+			City:                 req.City,
+			Region:               req.Region,
+			Country:              req.Country,
+			Org:                  req.Org,
+			Postal:               req.Postal,
+			Timezone:             req.Timezone,
+			// ビデオ情報
+			VideoId:          req.VideoID,
+			VideoTitle:       req.Title,
+			VideoDescription: *req.Description,
+			VideoTags:        req.Tags,
+			// ユーザー情報
+			UserId:   req.UserID,
+			ClientId: req.ClientID,
+			// 広告情報
+			AdId: req.AdID,
+		}))
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

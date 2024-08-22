@@ -202,7 +202,10 @@ type WatchCountAdVideoInput struct {
 	Postal               string  `json:"postal"`
 	Timezone             string  `json:"timezone"`
 	// ビデオ情報
-	VideoID string `json:"videoID"`
+	VideoID     string   `json:"videoID"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Tags        []string `json:"tags,omitempty"`
 	// ユーザー情報
 	UserID   string `json:"userID"`
 	ClientID string `json:"clientID"`

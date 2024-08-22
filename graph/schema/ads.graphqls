@@ -64,6 +64,9 @@ input WatchCountAdVideoInput {
   ビデオ情報
   """
   videoID: ID!
+  title: String!
+  description: String!
+  tags: [String!]
   """
   ユーザー情報
   """
@@ -80,5 +83,5 @@ extend type Query {
 }
 
 extend type Mutation {
-  watchCountAdVideo(input: AdVideoInput!): Boolean!
+  watchCountAdVideo(input: WatchCountAdVideoInput!): Boolean!
 }
