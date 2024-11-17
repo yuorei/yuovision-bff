@@ -2,6 +2,7 @@ package client
 
 import (
 	"log"
+	"os"
 
 	"github.com/yuorei/video-server/yuovision-proto/go/video/video_grpc"
 	"google.golang.org/grpc"
@@ -22,7 +23,7 @@ func NewClient() *Client {
 
 func (c *Client) NewConnect() {
 	// TCPサーバーのアドレスを指定
-	userAddress := "localhost:50051"
+	userAddress := os.Getenv("YUOVISION_SERVER")
 	// サーバーに接続する
 	conn, err := grpc.Dial(
 		userAddress,

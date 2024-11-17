@@ -67,8 +67,6 @@ github.com/vektah/gqlparser/v2 v2.5.11/go.mod h1:1rCcfwB2ekJofmluGWXMSEnPMZgbxzw
 github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913 h1:+qGGcbkzsfDQNPPe9UDgpxAWQrhbbBXOYJFQDq/dtJw=
 github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913/go.mod h1:4aEEwZQutDLsQv2Deui4iYQ6DWTxR14g6m8Wv88+Xqk=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
-github.com/yuorei/yuorei-ads-proto v0.0.0-20240820025554-738a1488a73e h1:wta+1C8wtx+Twc7rXbNRtqDWqLKQB8f8WjudBzkgO0s=
-github.com/yuorei/yuorei-ads-proto v0.0.0-20240820025554-738a1488a73e/go.mod h1:LJOQzwWtzllGN6WzPSOkpybdrsBQQ0mgrrJ3uP+C/4w=
 github.com/yuorei/yuorei-ads-proto v0.0.0-20240821104457-2bd7a8087abc h1:l/m2KqfQfQnwMgxo9qx6+75xM59rLN8TE/jcm6vL47g=
 github.com/yuorei/yuorei-ads-proto v0.0.0-20240821104457-2bd7a8087abc/go.mod h1:LJOQzwWtzllGN6WzPSOkpybdrsBQQ0mgrrJ3uP+C/4w=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
