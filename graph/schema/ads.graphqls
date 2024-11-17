@@ -78,10 +78,14 @@ input WatchCountAdVideoInput {
   adID: ID!
 }
 
+type WatchCountAdVideoPayload {
+  success: Boolean!
+}
+
 extend type Query {
   adVideo(input: AdVideoInput!): [AdVideoPayload!]!
 }
 
 extend type Mutation {
-  watchCountAdVideo(input: WatchCountAdVideoInput!): Boolean!
+  watchCountAdVideo(input: WatchCountAdVideoInput!): WatchCountAdVideoPayload!
 }

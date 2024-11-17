@@ -12,7 +12,11 @@ import (
 )
 
 // WatchCountAdVideo is the resolver for the watchCountAdVideo field.
-func (r *mutationResolver) WatchCountAdVideo(ctx context.Context, input model.WatchCountAdVideoInput) (bool, error) {
+func (r *mutationResolver) WatchCountAdVideo(ctx context.Context, input model.WatchCountAdVideoInput) (*model.WatchCountAdVideoPayload, error) {
+	ipInfomation, err := r.usecase.IPInputPort.IPInfomation(ctx, input.IPAddress)
+	if err != nil {
+		return nil, err
+	}
 	watchCountAdVideoRequest := &domain.WatchCountAdVideoRequest{
 		UserAgent:            input.UserAgent,
 		Platform:             input.Platform,
@@ -22,15 +26,15 @@ func (r *mutationResolver) WatchCountAdVideo(ctx context.Context, input model.Wa
 		Referrer:             *input.Referrer,
 		NetworkDownlink:      *input.NetworkDownlink,
 		NetworkEffectiveType: *input.NetworkEffectiveType,
-		IPAddress:            input.IPAddress,
-		Location:             input.Location,
-		Hostname:             input.Hostname,
-		City:                 input.City,
-		Region:               input.Region,
-		Country:              input.Country,
-		Org:                  input.Org,
-		Postal:               input.Postal,
-		Timezone:             input.Timezone,
+		IPAddress:            ipInfomation.IP,
+		Location:             ipInfomation.Loc,
+		Hostname:             ipInfomation.Hostname,
+		City:                 ipInfomation.City,
+		Region:               ipInfomation.Region,
+		Country:              ipInfomation.Country,
+		Org:                  ipInfomation.Org,
+		Postal:               ipInfomation.Postal,
+		Timezone:             ipInfomation.Timezone,
 		VideoID:              input.VideoID,
 		Title:                input.Title,
 		Description:          &input.Description,
@@ -40,21 +44,57 @@ func (r *mutationResolver) WatchCountAdVideo(ctx context.Context, input model.Wa
 		AdID:                 input.AdID,
 	}
 
-	err := r.usecase.WatchCountAdVideo(ctx, watchCountAdVideoRequest)
+	err = r.usecase.WatchCountAdVideo(ctx, watchCountAdVideoRequest)
 	if err != nil {
-		return false, err
+		return &model.WatchCountAdVideoPayload{Success: false}, err
 	}
 
-	return true, nil
+	return &model.WatchCountAdVideoPayload{Success: true}, nil
 }
 
 // AdVideo is the resolver for the AdVideo field.
 func (r *queryResolver) AdVideo(ctx context.Context, input model.AdVideoInput) ([]*model.AdVideoPayload, error) {
+	ipInfomation, err := r.usecase.IPInputPort.IPInfomation(ctx, input.IPAddress)
+	if err != nil {
+		return nil, err
+	}
 	// TODO: 関連した広告を取るために動画情報を取得する
 	title := ""
 	description := ""
 	tags := []string{}
-	adVideoRequest := domain.NewAdVideoRequest(input.UserAgent, input.Platform, input.Language, input.URL, input.PageTitle, *input.Referrer, *input.NetworkDownlink, *input.NetworkEffectiveType, input.IPAddress, input.Location, input.Hostname, input.City, input.Region, input.Country, input.Org, input.Postal, input.Timezone, input.VideoID, title, input.UserID, input.ClientID, &description, tags)
+	if input.Referrer == nil {
+		input.Referrer = new(string)
+	}
+	if input.NetworkDownlink == nil {
+		input.NetworkDownlink = new(string)
+	}
+	if input.NetworkEffectiveType == nil {
+		input.NetworkEffectiveType = new(string)
+	}
+	adVideoRequest := domain.NewAdVideoRequest(
+		input.UserAgent,
+		input.Platform,
+		input.Language,
+		input.URL,
+		input.PageTitle,
+		*input.Referrer,
+		*input.NetworkDownlink,
+		*input.NetworkEffectiveType,
+		ipInfomation.IP,
+		ipInfomation.Loc,
+		ipInfomation.Hostname,
+		ipInfomation.City,
+		ipInfomation.Region,
+		ipInfomation.Country,
+		ipInfomation.Org,
+		ipInfomation.Postal,
+		ipInfomation.Timezone,
+		input.VideoID,
+		title,
+		input.UserID,
+		input.ClientID,
+		&description,
+		tags)
 	ads, err := r.usecase.AdInputPort.GetAdsByVideoID(ctx, adVideoRequest)
 	if err != nil {
 		return nil, err

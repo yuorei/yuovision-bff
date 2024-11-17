@@ -213,6 +213,10 @@ type WatchCountAdVideoInput struct {
 	AdID string `json:"adID"`
 }
 
+type WatchCountAdVideoPayload struct {
+	Success bool `json:"success"`
+}
+
 type SubscribeChannelInput struct {
 	ChannelID string `json:"channelID"`
 }
