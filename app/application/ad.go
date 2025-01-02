@@ -30,6 +30,6 @@ func (a *Application) GetAdsByVideoID(ctx context.Context, req *domain.GetAdVide
 	return ads, nil
 }
 
-func (a *Application) WatchCountAdVideo(ctx context.Context, postAd *domain.Ad) (*domain.Ad, error) {
-	return a.Ad.adRepository.WatchCountAdVideoFromAdsServer(ctx, postAd)
+func (a *Application) WatchCountAdVideo(ctx context.Context, req *domain.WatchCountAdVideoRequest) error {
+	return a.Ad.adRepository.WatchCountAdVideoFromAdsServer(ctx, req)
 }

@@ -13,7 +13,7 @@ require (
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/rs/cors v1.11.0
 	github.com/vektah/gqlparser/v2 v2.5.11
-	github.com/yuorei/yuorei-ads-proto v0.0.0-20240820025554-738a1488a73e
+	github.com/yuorei/yuorei-ads-proto v0.0.0-20240821104457-2bd7a8087abc
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.34.0
 )

@@ -13,7 +13,7 @@ type AdsServer struct {
 func NewClientAdServer() *AdsServer {
 	clientAds := adsv1.NewAdManagementServiceClient(
 		http.DefaultClient,
-		"http://localhost:8080",
+		"http://localhost:8085",
 	)
 
 	return &AdsServer{

@@ -10,6 +10,7 @@ type Application struct {
 	User    *UserUseCase
 	Comment *CommentUseCase
 	Ad      *AdUseCase
+	IP      *IPUseCase
 }
 
 func NewApplication(infra *infrastructure.Infrastructure) *Application {
@@ -18,6 +19,7 @@ func NewApplication(infra *infrastructure.Infrastructure) *Application {
 	userUseCase := NewUserUseCase(infra)
 	CommentUseCase := NewCommentUseCase(infra)
 	AdUseCase := NewAdUseCase(infra)
+	IPUseCase := NewIPUseCase(infra)
 
 	return &Application{
 		Video:   videoUseCase,
@@ -25,5 +27,6 @@ func NewApplication(infra *infrastructure.Infrastructure) *Application {
 		User:    userUseCase,
 		Comment: CommentUseCase,
 		Ad:      AdUseCase,
+		IP:      IPUseCase,
 	}
 }
