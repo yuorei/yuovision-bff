@@ -2,6 +2,7 @@ package client
 
 import (
 	"net/http"
+	"os"
 
 	adsv1 "github.com/yuorei/yuorei-ads-proto/gen/rpc/ads/v1/adsv1connect"
 )
@@ -13,7 +14,7 @@ type AdsServer struct {
 func NewClientAdServer() *AdsServer {
 	clientAds := adsv1.NewAdManagementServiceClient(
 		http.DefaultClient,
-		"http://localhost:8085",
+		os.Getenv("AD_SERVER_API"),
 	)
 
 	return &AdsServer{
